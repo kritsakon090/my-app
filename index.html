@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#176b50">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Finance">
+<meta name="description" content="จัดการรายรับ รายจ่าย และหนี้สินส่วนตัว">
+<title>My Finance</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="app">
+<header class="topbar"><div class="logo">฿</div><div class="brand"><b>My Finance</b><small>จัดการเงินให้ง่ายขึ้น</small></div><button class="icon-btn" id="settingsShortcut" aria-label="ตั้งค่า">⚙</button></header>
+<main>
+<section class="page active" id="page-home">
+<div class="page-head"><div><small>ภาพรวมของคุณ</small><h1>การเงินของฉัน</h1></div><button class="month-btn" id="monthOpen">▦ <span id="monthText"></span>⌄</button></div>
+<div class="balance"><div class="balance-top"><span>ยอดคงเหลือสุทธิ</span><span class="pill">● ภาพรวม</span></div><div class="big-money" id="balance">฿0.00</div><div class="balance-stats"><div><small>● รายรับ</small><b id="income">฿0.00</b></div><div><small>● รายจ่าย</small><b id="expense">฿0.00</b></div></div></div>
+<div class="section-head"><h2>ภาพรวมรายจ่าย</h2><small id="chartMonth"></small></div>
+<div class="card"><div class="chart-head"><div><small>รายจ่ายทั้งหมด</small><b id="expenseTotal">฿0.00</b></div><span class="chart-symbol">↗</span></div><div id="bars" class="bars"><p class="empty">ยังไม่มีข้อมูลรายจ่ายในเดือนนี้</p></div></div>
+<div class="section-head"><h2>สัดส่วนรายจ่าย</h2><button class="link-btn" data-go="transactions">ดูรายการ</button></div>
+<div class="card donut-card"><div class="donut" id="donut"><div><b id="donutTotal">฿0</b><small>รายจ่าย</small></div></div><div id="legend" class="legend"><p class="empty">เพิ่มรายการรายจ่ายเพื่อดูสัดส่วน</p></div></div>
+<div class="section-head"><h2>รายการล่าสุด</h2><button class="link-btn" data-go="transactions">ทั้งหมด →</button></div><div id="recent" class="tx-list"></div>
+</section>
+
+<section class="page" id="page-transactions">
+<div class="page-head"><div><small>บันทึกทุกความเคลื่อนไหว</small><h1>รายการรับ-จ่าย</h1></div><button class="primary-small" id="addTxTop">＋ เพิ่ม</button></div>
+<button class="month-btn month-wide" id="monthOpen2">▦ <span id="monthText2"></span>⌄</button>
+<div class="filters"><button class="filter active" data-filter="all">ทั้งหมด</button><button class="filter" data-filter="income">รายรับ</button><button class="filter" data-filter="expense">รายจ่าย</button></div>
+<div class="list-summary"><span id="txCount">0 รายการ</span><b id="txNet">฿0.00</b></div><div id="transactions" class="tx-list"></div>
+</section>
+
+<section class="page" id="page-debts">
+<div class="page-head"><div><small>วางแผนการชำระ</small><h1>หนี้สินและบัตรเครดิต</h1></div><button class="primary-small" id="addDebtTop">＋ เพิ่มหนี้</button></div>
+<div class="debt-summary"><div><small>ยอดหนี้คงเหลือ</small><b id="debtRemaining">฿0</b></div><div class="highlight"><small>ต้องจ่ายเดือนนี้</small><b id="debtDue">฿0</b></div><div><small>รายการหนี้</small><b id="debtCount">0</b></div></div>
+<div class="section-head"><h2>กำหนดชำระเดือนนี้</h2><small id="debtMonth"></small></div><div id="dueDebts" class="debt-list"></div>
+<div class="section-head"><h2>หนี้ผ่อนชำระและบัตรเครดิต</h2></div><div id="debts" class="debt-list"></div>
+<div class="helper"><b>✓ ติดตามวันครบกำหนด</b><p>บันทึกการชำระแต่ละครั้งเพื่ออัปเดตยอดหนี้และงวดที่เหลือ</p></div>
+</section>
+
+<section class="page" id="page-slips">
+<div class="page-head"><div><small>นำเข้ารายจ่ายจากภาพ</small><h1>สแกนสลิป</h1></div><span class="slip-chip">OCR บนอุปกรณ์</span></div>
+<div class="card slip-intro"><b>สแกนหลายสลิปพร้อมกัน</b><p>ระบบอ่านข้อความจากรูปบนอุปกรณ์นี้ แล้วให้ตรวจสอบข้อมูลทั้งหมดก่อนบันทึก ไม่ส่งรูปสลิปไปยังบริการ OCR ภายนอก</p><div class="slip-actions"><label class="submit file-button" for="slipFiles">＋ เลือกรูปสลิป</label><input id="slipFiles" type="file" accept="image/*" multiple hidden><label class="outline file-button" for="slipCamera">▣ ถ่ายภาพ</label><input id="slipCamera" type="file" accept="image/*" capture="environment" hidden></div><small class="note">การอ่านครั้งแรกต้องใช้อินเทอร์เน็ตเพื่อโหลด OCR และข้อมูลภาษา อาจใช้เวลาตามจำนวนรูป</small></div>
+<div id="ocrProgress" class="card ocr-progress hidden"><div class="progress-head"><b id="ocrStatus">กำลังเตรียม OCR…</b><span id="ocrPercent">0%</span></div><div class="progress"><div id="ocrBar" style="width:0%"></div></div><p id="ocrDetail" class="note">กรุณาอย่าปิดหน้านี้ระหว่างประมวลผล</p><button id="cancelOcr" class="outline full" type="button">ยกเลิกการสแกน</button></div>
+<div id="slipReview" class="card slip-review hidden"><div class="section-head"><h2>ตรวจสอบก่อนบันทึก</h2><span id="reviewCount" class="slip-chip">0 รูป</span></div><p class="note">ติ๊กรายการที่ต้องการบันทึก ตรวจจำนวนเงิน วันที่ และหมวดหมู่ให้ถูกต้องก่อนกดยืนยันครั้งเดียว</p><div id="reviewRows" class="review-rows"></div><div class="review-footer"><b id="reviewTotal">เลือก 0 รายการ</b><button id="confirmSlips" class="submit" type="button">ยืนยันและบันทึกรายการ</button><button id="discardReview" class="outline full" type="button">ยกเลิกชุดนี้</button></div></div>
+<div class="section-head"><h2>คลังสลิป</h2><span id="slipArchiveCount" class="note">0 รูป</span></div>
+<div class="card archive-tools"><div class="form-grid"><div><label for="slipFrom">ตั้งแต่วันที่</label><input id="slipFrom" class="field" type="date"></div><div><label for="slipTo">ถึงวันที่</label><input id="slipTo" class="field" type="date"></div></div><div class="slip-actions"><button id="filterSlips" class="outline" type="button">กรองวันที่</button><button id="resetSlipFilter" class="outline" type="button">แสดงทั้งหมด</button><button id="deleteFilteredSlips" class="delete-inline" type="button">ลบรูปตามตัวกรอง</button></div><p class="note">การลบรูปจะไม่ลบรายการรายรับ–รายจ่ายที่บันทึกไว้</p></div>
+<div id="slipArchive" class="slip-archive"><div class="card"><p class="empty">ยังไม่มีรูปสลิปที่บันทึกไว้</p></div></div>
+</section>
+
+<section class="page" id="page-settings">
+<div class="page-head"><div><small>ปรับให้เข้ากับคุณ</small><h1>ตั้งค่า</h1></div></div>
+<div class="card settings-card"><div class="settings-title"><b>หมวดหมู่รายการ</b><small>จัดการหมวดหมู่รายรับและรายจ่าย</small></div><div id="categories"></div><button class="outline full" id="addCategory">＋ เพิ่มหมวดหมู่</button></div>
+<div class="card settings-card"><div class="settings-title"><b>ข้อมูลและการสำรอง</b><small>ข้อมูลเก็บไว้ในอุปกรณ์นี้เป็นหลัก</small></div><button class="setting-action" id="export">⇩ <span><b>สำรองข้อมูล</b><small>ส่งออกข้อมูลเป็นไฟล์ JSON</small></span>›</button><button class="setting-action" id="import">⇧ <span><b>กู้คืนข้อมูล</b><small>นำเข้าจากไฟล์สำรอง</small></span>›</button><input id="importFile" type="file" accept=".json,application/json" hidden></div>
+<div class="card settings-card"><b>เกี่ยวกับ My Finance</b><p class="note">เวอร์ชัน 3.1 · PWA ใช้งานออฟไลน์ได้เมื่อเปิดเว็บสำเร็จอย่างน้อยหนึ่งครั้ง ข้อมูลเก็บในเบราว์เซอร์นี้ ไม่ซิงก์ข้ามอุปกรณ์อัตโนมัติ ควรสำรองข้อมูลเป็นระยะ รูปสลิปเก็บแยกในคลังอุปกรณ์และยังไม่รวมในไฟล์ JSON สำรอง</p></div>
+</section>
+</main>
+<button class="fab" id="fab" aria-label="เพิ่มรายการ">＋</button>
+<nav class="bottom-nav"><button class="nav active" data-page="home"><span>⌂</span>หน้าหลัก</button><button class="nav" data-page="transactions"><span>⇄</span>รายการ</button><button class="nav" data-page="debts"><span>▣</span>หนี้สิน</button><button class="nav" data-page="slips"><span>▤</span>สลิป</button><button class="nav" data-page="settings"><span>⚙</span>ตั้งค่า</button></nav>
+</div>
+
+<div class="backdrop" id="txModal"><section class="modal"><div class="grabber"></div><div class="modal-head"><div><small>บันทึกความเคลื่อนไหว</small><h2 id="txModalTitle">เพิ่มรายการ</h2></div><button class="close" data-close="txModal">×</button></div>
+<form id="txForm"><input type="hidden" id="txId"><div class="segmented" id="txTypes"><button type="button" class="selected" data-type="expense">รายจ่าย</button><button type="button" data-type="income">รายรับ</button></div>
+<label>ชื่อรายการ</label><input class="field" id="txTitle" maxlength="80" required placeholder="เช่น ค่าอาหารกลางวัน">
+<label>จำนวนเงิน (บาท)</label><input class="field amount" id="txAmount" type="number" min=".01" step=".01" inputmode="decimal" required placeholder="0.00">
+<div class="form-grid"><div><label>หมวดหมู่</label><select class="field" id="txCategory" required></select></div><div><label>วันที่</label><input class="field" id="txDate" type="date" required></div></div>
+<label>หมายเหตุ (ไม่บังคับ)</label><textarea class="field" id="txNote" rows="2" maxlength="250" placeholder="รายละเอียดเพิ่มเติม"></textarea>
+<button class="submit" type="submit">บันทึกรายการ</button><button class="delete hidden" id="deleteTx" type="button">ลบรายการนี้</button></form></section></div>
+
+<div class="backdrop" id="debtModal"><section class="modal"><div class="grabber"></div><div class="modal-head"><div><small>วางแผนหนี้สิน</small><h2 id="debtModalTitle">เพิ่มหนี้สิน</h2></div><button class="close" data-close="debtModal">×</button></div>
+<form id="debtForm"><input type="hidden" id="debtId"><label>ชื่อหนี้ / บัตรเครดิต</label><input class="field" id="debtTitle" required maxlength="80" placeholder="เช่น ค่างวดรถ">
+<div class="form-grid"><div><label>ประเภท</label><select class="field" id="debtKind"><option value="installment">ผ่อนชำระ</option><option value="credit">บัตรเครดิต</option><option value="loan">สินเชื่อ / อื่น ๆ</option></select></div><div><label>วันครบกำหนด</label><select class="field" id="debtDay"></select></div></div>
+<div class="form-grid"><div><label>ยอดหนี้เต็ม (บาท)</label><input class="field" id="debtTotal" type="number" min=".01" step=".01" required></div><div><label>ยอดจ่ายต่อเดือน</label><input class="field" id="debtMonthly" type="number" min=".01" step=".01" required></div></div>
+<div class="form-grid"><div><label>ยอดที่จ่ายแล้ว</label><input class="field" id="debtPaid" type="number" min="0" step=".01" value="0" required></div><div><label>จำนวนงวดทั้งหมด</label><input class="field" id="debtInstallments" type="number" min="1" step="1" placeholder="เช่น 48"></div></div>
+<label>วันเริ่มชำระ</label><input class="field" id="debtStart" type="date" required><label>หมายเหตุ (ไม่บังคับ)</label><textarea class="field" id="debtNote" rows="2"></textarea>
+<p class="note">ยอดคงเหลือคำนวณจากยอดหนี้เต็มลบยอดที่จ่ายแล้ว โปรดตรวจสอบยอดจริงจากเจ้าหนี้</p><button class="submit" type="submit">บันทึกหนี้สิน</button><button class="delete hidden" id="deleteDebt" type="button">ลบหนี้นี้</button></form></section></div>
+
+<div class="backdrop" id="categoryModal"><section class="modal compact"><div class="grabber"></div><div class="modal-head"><div><small>ปรับแต่งรายการ</small><h2>เพิ่มหมวดหมู่</h2></div><button class="close" data-close="categoryModal">×</button></div><form id="categoryForm"><label>ชื่อหมวดหมู่</label><input class="field" id="categoryName" required maxlength="40" placeholder="เช่น ค่าสัตว์เลี้ยง"><div class="segmented" id="categoryTypes"><button type="button" class="selected" data-category-type="expense">รายจ่าย</button><button type="button" data-category-type="income">รายรับ</button></div><button class="submit" type="submit">บันทึกหมวดหมู่</button></form></section></div>
+<div class="backdrop" id="monthModal"><section class="modal compact"><div class="grabber"></div><div class="modal-head"><div><small>เลือกช่วงเวลา</small><h2>เลือกเดือน</h2></div><button class="close" data-close="monthModal">×</button></div><label>เดือนที่ต้องการดู</label><input class="field" id="monthInput" type="month"><button class="submit" id="applyMonth">แสดงข้อมูลเดือนนี้</button><button class="outline full" id="resetMonth">กลับไปเดือนปัจจุบัน</button></section></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="./script.js"></script>
+</body></html>
