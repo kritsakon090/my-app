@@ -14,8 +14,23 @@ const fmtDate=s=>{if(!s)return "-";let d=new Date(s+"T00:00:00");return Number.i
 const fmtMonth=s=>{let [y,m]=s.split("-").map(Number);return new Date(y,m-1,1).toLocaleDateString("th-TH",{month:"long",year:"numeric"})};
 let transactions=read(TXKEY,[]),categories=read(CATKEY,null),debts=read(DEBTKEY,[]),selectedMonth=monthNow(),filter="all",txType="expense",catType="expense",toastTimer,stagedSlips=[],ocrCancelled=false,slipFilter={from:"",to:""},ocrWorker=null;
 if(!Array.isArray(transactions))transactions=[];
+const INCOME_CATEGORY_NAMES=new Set(["เงินเดือน","OT","รายรับอื่น ๆ","รายรับอื่นๆ","โบนัส","ค่าคอมมิชชั่น","ดอกเบี้ย","เงินคืน","รายได้เสริม"]);
 if(!Array.isArray(categories))categories=DEFAULT_CATS.map(([name,type])=>({id:uid(),name,type}));
-else categories=categories.map(c=>typeof c==="string"?{id:uid(),name:c,type:"expense"}:{id:c.id||uid(),name:c.name||"อื่น ๆ",type:c.type==="income"?"income":"expense"});
+else {
+  categories=categories.map(c=>{
+    if(typeof c==="string") return {id:uid(),name:c,type:INCOME_CATEGORY_NAMES.has(c.trim())?"income":"expense"};
+    const name=String(c.name||"อื่น ๆ").trim();
+    const inferred=INCOME_CATEGORY_NAMES.has(name)?"income":"expense";
+    return {id:c.id||uid(),name,type:c.type==="income"||(!c.type&&inferred==="income")?"income":"expense"};
+  });
+  // Ensure default income categories are available even when an older version
+  // saved categories as strings or only had expense categories.
+  for(const [name,type] of DEFAULT_CATS){
+    if(!categories.some(c=>c.name.toLowerCase()===name.toLowerCase()&&c.type===type)){
+      categories.push({id:uid(),name,type});
+    }
+  }
+}
 if(!Array.isArray(debts))debts=[];
 const saveTx=()=>localStorage.setItem(TXKEY,JSON.stringify(transactions)),saveCats=()=>localStorage.setItem(CATKEY,JSON.stringify(categories)),saveDebts=()=>localStorage.setItem(DEBTKEY,JSON.stringify(debts));
 const monthTx=()=>transactions.filter(t=>(t.date||"").slice(0,7)===selectedMonth);

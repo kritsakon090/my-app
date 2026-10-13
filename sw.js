@@ -1,4 +1,4 @@
-const CACHE_NAME="my-finance-v3-1";
+const CACHE_NAME="my-finance-v3-1-2";
 const FILES=["./","./index.html","./style.css","./script.js","./manifest.json","./icon.svg","./icon-180.png","./icon-192.png","./icon-512.png","./icon-maskable-512.png"];
 self.addEventListener("install",event=>event.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await Promise.allSettled(FILES.map(async f=>{try{await c.add(f)}catch(e){console.warn("Cache skipped",f)}}));await self.skipWaiting()})()));
 self.addEventListener("activate",event=>event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith("my-finance-")&&k!==CACHE_NAME).map(k=>caches.delete(k)));await self.clients.claim()})()));

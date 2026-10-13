@@ -31,6 +31,7 @@
 <section class="page" id="page-transactions">
 <div class="page-head"><div><small>บันทึกทุกความเคลื่อนไหว</small><h1>รายการรับ-จ่าย</h1></div><button class="primary-small" id="addTxTop">＋ เพิ่ม</button></div>
 <button class="month-btn month-wide" id="monthOpen2">▦ <span id="monthText2"></span>⌄</button>
+<div class="slip-actions"><button class="outline full" type="button" data-go="slips">▧ สแกนสลิป / คลังสลิป</button></div>
 <div class="filters"><button class="filter active" data-filter="all">ทั้งหมด</button><button class="filter" data-filter="income">รายรับ</button><button class="filter" data-filter="expense">รายจ่าย</button></div>
 <div class="list-summary"><span id="txCount">0 รายการ</span><b id="txNet">฿0.00</b></div><div id="transactions" class="tx-list"></div>
 </section>
@@ -43,25 +44,66 @@
 <div class="helper"><b>✓ ติดตามวันครบกำหนด</b><p>บันทึกการชำระแต่ละครั้งเพื่ออัปเดตยอดหนี้และงวดที่เหลือ</p></div>
 </section>
 
-<section class="page" id="page-slips">
-<div class="page-head"><div><small>นำเข้ารายจ่ายจากภาพ</small><h1>สแกนสลิป</h1></div><span class="slip-chip">OCR บนอุปกรณ์</span></div>
-<div class="card slip-intro"><b>สแกนหลายสลิปพร้อมกัน</b><p>ระบบอ่านข้อความจากรูปบนอุปกรณ์นี้ แล้วให้ตรวจสอบข้อมูลทั้งหมดก่อนบันทึก ไม่ส่งรูปสลิปไปยังบริการ OCR ภายนอก</p><div class="slip-actions"><label class="submit file-button" for="slipFiles">＋ เลือกรูปสลิป</label><input id="slipFiles" type="file" accept="image/*" multiple hidden><label class="outline file-button" for="slipCamera">▣ ถ่ายภาพ</label><input id="slipCamera" type="file" accept="image/*" capture="environment" hidden></div><small class="note">การอ่านครั้งแรกต้องใช้อินเทอร์เน็ตเพื่อโหลด OCR และข้อมูลภาษา อาจใช้เวลาตามจำนวนรูป</small></div>
-<div id="ocrProgress" class="card ocr-progress hidden"><div class="progress-head"><b id="ocrStatus">กำลังเตรียม OCR…</b><span id="ocrPercent">0%</span></div><div class="progress"><div id="ocrBar" style="width:0%"></div></div><p id="ocrDetail" class="note">กรุณาอย่าปิดหน้านี้ระหว่างประมวลผล</p><button id="cancelOcr" class="outline full" type="button">ยกเลิกการสแกน</button></div>
-<div id="slipReview" class="card slip-review hidden"><div class="section-head"><h2>ตรวจสอบก่อนบันทึก</h2><span id="reviewCount" class="slip-chip">0 รูป</span></div><p class="note">ติ๊กรายการที่ต้องการบันทึก ตรวจจำนวนเงิน วันที่ และหมวดหมู่ให้ถูกต้องก่อนกดยืนยันครั้งเดียว</p><div id="reviewRows" class="review-rows"></div><div class="review-footer"><b id="reviewTotal">เลือก 0 รายการ</b><button id="confirmSlips" class="submit" type="button">ยืนยันและบันทึกรายการ</button><button id="discardReview" class="outline full" type="button">ยกเลิกชุดนี้</button></div></div>
-<div class="section-head"><h2>คลังสลิป</h2><span id="slipArchiveCount" class="note">0 รูป</span></div>
-<div class="card archive-tools"><div class="form-grid"><div><label for="slipFrom">ตั้งแต่วันที่</label><input id="slipFrom" class="field" type="date"></div><div><label for="slipTo">ถึงวันที่</label><input id="slipTo" class="field" type="date"></div></div><div class="slip-actions"><button id="filterSlips" class="outline" type="button">กรองวันที่</button><button id="resetSlipFilter" class="outline" type="button">แสดงทั้งหมด</button><button id="deleteFilteredSlips" class="delete-inline" type="button">ลบรูปตามตัวกรอง</button></div><p class="note">การลบรูปจะไม่ลบรายการรายรับ–รายจ่ายที่บันทึกไว้</p></div>
-<div id="slipArchive" class="slip-archive"><div class="card"><p class="empty">ยังไม่มีรูปสลิปที่บันทึกไว้</p></div></div>
-</section>
-
 <section class="page" id="page-settings">
 <div class="page-head"><div><small>ปรับให้เข้ากับคุณ</small><h1>ตั้งค่า</h1></div></div>
 <div class="card settings-card"><div class="settings-title"><b>หมวดหมู่รายการ</b><small>จัดการหมวดหมู่รายรับและรายจ่าย</small></div><div id="categories"></div><button class="outline full" id="addCategory">＋ เพิ่มหมวดหมู่</button></div>
 <div class="card settings-card"><div class="settings-title"><b>ข้อมูลและการสำรอง</b><small>ข้อมูลเก็บไว้ในอุปกรณ์นี้เป็นหลัก</small></div><button class="setting-action" id="export">⇩ <span><b>สำรองข้อมูล</b><small>ส่งออกข้อมูลเป็นไฟล์ JSON</small></span>›</button><button class="setting-action" id="import">⇧ <span><b>กู้คืนข้อมูล</b><small>นำเข้าจากไฟล์สำรอง</small></span>›</button><input id="importFile" type="file" accept=".json,application/json" hidden></div>
-<div class="card settings-card"><b>เกี่ยวกับ My Finance</b><p class="note">เวอร์ชัน 3.1 · PWA ใช้งานออฟไลน์ได้เมื่อเปิดเว็บสำเร็จอย่างน้อยหนึ่งครั้ง ข้อมูลเก็บในเบราว์เซอร์นี้ ไม่ซิงก์ข้ามอุปกรณ์อัตโนมัติ ควรสำรองข้อมูลเป็นระยะ รูปสลิปเก็บแยกในคลังอุปกรณ์และยังไม่รวมในไฟล์ JSON สำรอง</p></div>
+<div class="card settings-card"><div class="settings-title"><b>สลิปและหลักฐานการจ่าย</b><small>สแกนสลิปและจัดการรูปที่บันทึกไว้</small></div><button class="setting-action" type="button" data-go="slips">▧ <span><b>เปิดสแกนสลิป</b><small>นำเข้ารูป ตรวจสอบ และดูคลังสลิป</small></span>›</button></div>
+<div class="card settings-card"><b>เกี่ยวกับ My Finance</b><p class="note">เวอร์ชัน 3.1 · PWA ใช้งานออฟไลน์ได้เมื่อเปิดเว็บสำเร็จอย่างน้อยหนึ่งครั้ง ข้อมูลเก็บในเบราว์เซอร์นี้ ไม่ซิงก์ข้ามอุปกรณ์อัตโนมัติ ควรสำรองข้อมูลเป็นระยะ</p></div>
 </section>
+
+<section class="page" id="page-slips">
+  <div class="page-head"><div><small>นำเข้ารายจ่ายจากรูป</small><h1>สแกนสลิป</h1></div></div>
+  <div class="card slip-intro">
+    <span class="slip-chip">OCR · ภาษาไทย + English</span>
+    <b>อ่านข้อมูลจากสลิปก่อนบันทึก</b>
+    <p>เลือกรูปสลิปหรือถ่ายภาพ ระบบจะพยายามอ่านจำนวนเงิน วันที่ และรายละเอียดให้ ตรวจสอบทุกช่องก่อนยืนยัน รายการจะถูกบันทึกเป็นรายจ่าย</p>
+    <div class="slip-actions">
+      <label class="submit file-button" for="slipFiles">เลือกรูปจากคลังภาพ</label>
+      <input id="slipFiles" type="file" accept="image/*" multiple hidden>
+      <label class="outline file-button" for="slipCamera">ถ่ายภาพสลิป</label>
+      <input id="slipCamera" type="file" accept="image/*" capture="environment" hidden>
+    </div>
+    <p class="note">การสแกนครั้งแรกต้องใช้อินเทอร์เน็ตเพื่อโหลดระบบ OCR และข้อมูลภาษา ความแม่นยำขึ้นอยู่กับรูปและรูปแบบสลิป</p>
+  </div>
+
+  <div id="ocrProgress" class="card ocr-progress hidden">
+    <div class="progress-head"><b id="ocrStatus">กำลังเตรียม OCR…</b><span id="ocrPercent">0%</span></div>
+    <div class="progress"><div id="ocrBar" style="width:0%"></div></div>
+    <p id="ocrDetail" class="note"></p>
+    <button class="outline full" type="button" id="cancelOcr">ยกเลิกการสแกน</button>
+  </div>
+
+  <div id="slipReview" class="card slip-review hidden">
+    <div class="section-head"><h2>ตรวจสอบก่อนบันทึก</h2><small id="reviewCount">0 รูป</small></div>
+    <p class="note">แก้ไขข้อมูลที่อ่านผิด และเลือกเฉพาะรายการที่ต้องการบันทึก</p>
+    <div id="reviewRows" class="review-rows"></div>
+    <div class="review-footer">
+      <b id="reviewTotal">เลือก 0 รายการ</b>
+      <button class="submit full" type="button" id="confirmSlips" disabled>ยืนยันบันทึกรายจ่าย</button>
+      <button class="outline full" type="button" id="discardReview">ยกเลิกชุดสลิป</button>
+    </div>
+  </div>
+
+  <div class="section-head"><h2>คลังรูปสลิป</h2><small id="slipArchiveCount">0 รูป</small></div>
+  <div class="card archive-tools">
+    <div class="form-grid">
+      <div><label for="slipFrom">ตั้งแต่วันที่</label><input class="field" id="slipFrom" type="date"></div>
+      <div><label for="slipTo">ถึงวันที่</label><input class="field" id="slipTo" type="date"></div>
+    </div>
+    <div class="slip-actions">
+      <button class="outline" type="button" id="filterSlips">กรองวันที่</button>
+      <button class="outline" type="button" id="resetSlipFilter">ล้างตัวกรอง</button>
+      <button class="delete-inline" type="button" id="deleteFilteredSlips">ลบรูปตามตัวกรอง</button>
+    </div>
+    <p class="note">ลบรูปสลิปจะไม่ลบรายการรายรับ–รายจ่ายที่บันทึกแล้ว</p>
+  </div>
+  <div id="slipArchive" class="slip-archive"><div class="card"><p class="empty">กำลังโหลดคลังรูปสลิป…</p></div></div>
+</section>
+
 </main>
 <button class="fab" id="fab" aria-label="เพิ่มรายการ">＋</button>
-<nav class="bottom-nav"><button class="nav active" data-page="home"><span>⌂</span>หน้าหลัก</button><button class="nav" data-page="transactions"><span>⇄</span>รายการ</button><button class="nav" data-page="debts"><span>▣</span>หนี้สิน</button><button class="nav" data-page="slips"><span>▤</span>สลิป</button><button class="nav" data-page="settings"><span>⚙</span>ตั้งค่า</button></nav>
+<nav class="bottom-nav"><button class="nav active" data-page="home"><span>⌂</span>หน้าหลัก</button><button class="nav" data-page="transactions"><span>⇄</span>รายการ</button><button class="nav" data-page="debts"><span>▣</span>หนี้สิน</button><button class="nav" data-page="settings"><span>⚙</span>ตั้งค่า</button></nav>
 </div>
 
 <div class="backdrop" id="txModal"><section class="modal"><div class="grabber"></div><div class="modal-head"><div><small>บันทึกความเคลื่อนไหว</small><h2 id="txModalTitle">เพิ่มรายการ</h2></div><button class="close" data-close="txModal">×</button></div>
